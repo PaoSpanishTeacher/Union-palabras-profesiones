@@ -1,8 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-# Configuración de página
-st.set_page_config(page_title="Formar palabras de Profesiones", layout="wide")
+st.set_page_config(page_title="Rompecabezas Profesiones", layout="wide")
 
 st.markdown("""
     <style>
@@ -11,7 +10,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-html_profesiones = r"""
+html_profesiones_premium = r"""
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -37,305 +36,313 @@ html_profesiones = r"""
             min-height: 100vh;
             background-color: var(--bg-school);
             background-image: radial-gradient(#00b4d822 2px, transparent 2px), linear-gradient(180deg, #caf0f8 0%, #fdf0d5 100%);
-            background-size: 30px 30px, 100% 100%;
             display: flex; flex-direction: column; align-items: center;
-            padding-top: 40px; /* ESPACIO PARA QUE NO SE CORTE EL TITULO */
+            padding-top: 50px;
         }
 
-        header { 
-            text-align: center; 
-            padding: 10px 20px 20px 20px; 
-            width: 100%;
-        }
+        header { text-align: center; padding-bottom: 20px; width: 100%; }
+        h1 { font-family: 'Fredoka', sans-serif; font-size: 2.8rem; color: var(--text-main); text-shadow: 2px 2px 0px white; }
+        .brand-name { font-family: 'Dancing Script', cursive; font-size: 1.6rem; color: var(--accent); }
 
-        h1 { 
-            font-family: 'Fredoka', sans-serif; 
-            font-size: clamp(1.8rem, 4vw, 2.8rem); /* Tamaño adaptativo */
-            color: var(--text-main); 
-            text-shadow: 2px 2px 0px white;
-            line-height: 1.2;
-        }
-
-        .brand-name { 
-            font-family: 'Dancing Script', cursive; 
-            font-size: 1.5rem; 
-            color: var(--accent);
-            margin-top: 5px;
-        }
-
-        .main-content {
+        .main-layout {
             display: grid;
-            grid-template-columns: 260px 1fr;
-            gap: 25px;
+            grid-template-columns: 280px 1fr;
+            gap: 30px;
             width: 95%;
-            max-width: 1150px;
+            max-width: 1200px;
             margin-top: 20px;
-            padding-bottom: 50px;
         }
 
-        /* LISTA LATERAL */
-        .reference-list {
+        /* LISTA DE GUÍA */
+        .reference-sidebar {
             background: white;
-            padding: 20px;
-            border-radius: 20px;
-            border: 3px solid var(--primary);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            padding: 25px;
+            border-radius: 25px;
+            border: 4px solid var(--primary);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
             height: fit-content;
-            position: sticky;
-            top: 20px;
         }
-        .reference-list h3 { 
-            font-family: 'Fredoka', sans-serif; 
-            color: var(--secondary); 
-            margin-bottom: 15px; 
-            text-align: center;
-            font-size: 1.4rem;
-        }
+        .reference-sidebar h3 { font-family: 'Fredoka', sans-serif; color: var(--secondary); margin-bottom: 20px; text-align: center; }
         .ref-item {
-            padding: 10px 15px;
-            margin-bottom: 10px;
-            background: #fdfbff;
-            border: 1px solid #eee;
-            border-radius: 12px;
+            padding: 12px 18px;
+            margin-bottom: 12px;
+            background: #f8f9ff;
+            border-radius: 15px;
             font-weight: 700;
             color: var(--text-main);
-            text-transform: capitalize;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s ease;
+            display: flex; justify-content: space-between; align-items: center;
+            border: 2px solid transparent;
+            transition: all 0.3s;
         }
         .ref-item.done {
             background: #e8f5e9;
             color: #2e7d32;
             border-color: #c8e6c9;
-            opacity: 0.8;
+            text-decoration: line-through;
+            opacity: 0.7;
         }
 
-        /* ÁREA JUEGO */
-        .game-area { display: flex; flex-direction: column; gap: 25px; }
+        /* ÁREA DE JUEGO */
+        .game-zone { display: flex; flex-direction: column; gap: 25px; }
 
-        .progress-container {
-            width: 100%; background: white; height: 24px;
+        .progress-bar-wrap {
+            width: 100%; background: white; height: 25px;
             border-radius: 20px; border: 3px solid var(--secondary);
             overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
-        #progress-bar {
-            height: 100%; width: 0%; background: linear-gradient(90deg, #4cc9f0, #4361ee);
-            transition: width 0.6s ease-in-out;
+        #progress-fill {
+            height: 100%; width: 0%; background: linear-gradient(90deg, #4cc9f0, #f72585);
+            transition: width 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .drop-zone {
+        .drop-area {
             background: white; border: 4px dashed var(--text-main);
-            border-radius: 20px; padding: 30px; min-height: 140px;
+            border-radius: 25px; padding: 40px; min-height: 160px;
             display: flex; justify-content: center; align-items: center;
-            gap: 12px; position: relative;
-            box-shadow: inset 0 4px 10px rgba(0,0,0,0.05);
+            gap: 15px; position: relative;
+            box-shadow: inset 0 5px 15px rgba(0,0,0,0.05);
         }
-        .drop-zone::before {
-            content: "Arrastra las sílabas aquí"; color: #aaa; font-style: italic; font-size: 1.1rem;
-        }
-        .drop-zone.has-items::before { display: none; }
+        .drop-area::before { content: "¡Sueltas las sílabas aquí!"; color: #bbb; font-style: italic; font-size: 1.2rem; }
+        .drop-area.has-content::before { display: none; }
 
-        .pieces-pool {
-            background: rgba(255, 255, 255, 0.4); border: 2px solid var(--secondary);
-            border-radius: 20px; padding: 20px; display: flex; flex-wrap: wrap;
-            justify-content: center; gap: 12px; min-height: 220px;
+        .pool-area {
+            background: rgba(255, 255, 255, 0.4); border: 3px solid var(--secondary);
+            border-radius: 25px; padding: 25px; display: flex; flex-wrap: wrap;
+            justify-content: center; gap: 15px; min-height: 250px;
             backdrop-filter: blur(5px);
         }
 
-        .piece {
+        .syllable {
             background: white; border: 3px solid var(--secondary);
-            border-radius: 12px; padding: 14px 22px;
-            font-family: 'Fredoka', sans-serif; font-size: 1.3rem;
+            border-radius: 15px; padding: 15px 25px;
+            font-family: 'Fredoka', sans-serif; font-size: 1.4rem;
             color: var(--text-main); cursor: grab;
-            box-shadow: 0 5px 0px var(--secondary);
+            box-shadow: 0 6px 0px var(--secondary);
             text-transform: uppercase;
-            transition: transform 0.2s;
         }
-        .piece:hover { transform: translateY(-3px); }
-        .piece.dragging { opacity: 0.4; transform: scale(1.1); }
-        .piece.correct { background: var(--success); color: white; border-color: #2e7d32; box-shadow: 0 4px 0px #2e7d32; }
+        .syllable:active { cursor: grabbing; transform: translateY(3px); box-shadow: 0 2px 0px var(--secondary); }
+        .syllable.dragging { opacity: 0.3; }
+        .syllable.is-correct { background: var(--success); color: white; border-color: #2e7d32; box-shadow: 0 4px 0px #2e7d32; }
 
-        /* ALERTAS */
-        #msg-alert {
+        /* ALERTAS Y EFECTOS */
+        #alert-box {
             position: fixed; top: 15%; left: 50%; transform: translateX(-50%) scale(0);
-            padding: 12px 35px; border-radius: 50px; color: white; font-weight: bold;
-            font-size: 1.3rem; z-index: 100; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            padding: 15px 40px; border-radius: 50px; color: white; font-weight: bold;
+            font-size: 1.5rem; z-index: 200; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        #msg-alert.show { transform: translateX(-50%) scale(1); }
-        .msg-correct { background: var(--success); box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4); }
-        .msg-error { background: var(--error); box-shadow: 0 4px 15px rgba(244, 67, 54, 0.4); }
+        #alert-box.show { transform: translateX(-50%) scale(1); }
+        .bg-win { background: var(--success); }
+        .bg-fail { background: var(--error); }
 
-        #final-screen {
+        .balloon { position: absolute; bottom: -100px; animation: floatUp 6s linear forwards; font-size: 3rem; z-index: 1001; }
+        @keyframes floatUp { to { transform: translateY(-120vh) rotate(20deg); } }
+
+        #win-modal {
             position: fixed; inset: 0; background: rgba(255, 255, 255, 0.98);
             display: none; flex-direction: column; justify-content: center;
             align-items: center; z-index: 1000; text-align: center;
         }
-        #final-screen.active { display: flex; }
+        #win-modal.active { display: flex; }
 
-        .btn-restart {
+        .btn-play {
             background: var(--accent); color: white; border: none;
-            padding: 18px 45px; font-size: 1.6rem; border-radius: 50px;
-            cursor: pointer; margin-top: 25px; box-shadow: 0 6px 0px #a3165b;
-            font-family: 'Fredoka', sans-serif;
+            padding: 20px 50px; font-size: 1.8rem; border-radius: 60px;
+            cursor: pointer; margin-top: 30px; box-shadow: 0 8px 0px #a3165b;
+            font-family: 'Fredoka', sans-serif; transition: 0.1s;
         }
-
-        .watermark {
-            position: fixed; bottom: 15px; right: 20px;
-            font-size: 0.9rem; color: rgba(58, 12, 163, 0.2);
-            font-family: 'Dancing Script', cursive; font-weight: bold;
-        }
-
-        @media (max-width: 800px) {
-            .main-content { grid-template-columns: 1fr; }
-            .reference-list { position: relative; top: 0; order: 2; }
-            .game-area { order: 1; }
-        }
+        .btn-play:active { transform: translateY(4px); box-shadow: 0 4px 0px #a3165b; }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>Unión de sílabas - Profesiones</h1>
+        <h1>Rompecabezas - Profesiones</h1>
         <div class="brand-name">PaoSpanishTeacher</div>
     </header>
 
-    <div class="main-content">
-        <div class="reference-list">
+    <div class="main-layout">
+        <div class="reference-sidebar">
             <h3>Lista de Guía</h3>
-            <div id="guide-items"></div>
+            <div id="guide-container"></div>
         </div>
 
-        <div class="game-area">
-            <div class="progress-container">
-                <div id="progress-bar"></div>
+        <div class="game-zone">
+            <div class="progress-bar-wrap">
+                <div id="progress-fill"></div>
             </div>
 
-            <div class="drop-zone" id="drop-zone"></div>
-            <div class="pieces-pool" id="pieces-pool"></div>
+            <div class="drop-area" id="drop-zone"></div>
+            <div class="pool-area" id="pieces-pool"></div>
         </div>
     </div>
 
-    <div id="msg-alert"></div>
-    <div class="watermark">PaoSpanishTeacher</div>
+    <div id="alert-box"></div>
 
-    <div id="final-screen">
-        <span style="font-size: 7rem;">👨‍🏫</span>
-        <h1 style="margin-bottom: 10px;">¡Excelente trabajo!</h1>
-        <p style="font-size: 1.3rem;">Has completado todas las profesiones.</p>
-        <p style="font-weight: bold; color: var(--accent); margin-top: 10px;">Juego creado por PaoSpanishTeacher</p>
-        <button class="btn-restart" onclick="location.reload()">Jugar otra vez</button>
+    <div id="win-modal">
+        <span style="font-size: 8rem;">👨‍🏫</span>
+        <h1>¡Increíble! ¡Eres un experto!</h1>
+        <p style="font-size: 1.5rem; color: var(--secondary);">Has completado todas las profesiones.</p>
+        <button class="btn-play" onclick="resetGame()">Jugar de nuevo</button>
     </div>
 
     <script>
         const PROFESSIONS = [
-            { full: "doctor", parts: ["DOC", "TOR"] },
-            { full: "profesora", parts: ["PRO", "FE", "SORA"] },
-            { full: "ingeniero", parts: ["IN", "GE", "NIE", "RO"] },
-            { full: "policía", parts: ["PO", "LI", "CÍ", "A"] },
-            { full: "bombero", parts: ["BOM", "BE", "RO"] },
-            { full: "enfermera", parts: ["EN", "FER", "ME", "RA"] },
-            { full: "abogado", parts: ["ABO", "GA", "DO"] },
-            { full: "piloto", parts: ["PI", "LO", "TO"] },
-            { full: "músico", parts: ["MÚ", "SI", "CO"] },
-            { full: "arquitecta", parts: ["AR", "QUI", "TEC", "TA"] }
+            { id: "doctor", parts: ["DOC", "TOR"] },
+            { id: "profesora", parts: ["PRO", "FE", "SORA"] },
+            { id: "ingeniero", parts: ["IN", "GE", "NIE", "RO"] },
+            { id: "policía", parts: ["PO", "LI", "CÍ", "A"] },
+            { id: "bombero", parts: ["BOM", "BE", "RO"] },
+            { id: "enfermera", parts: ["EN", "FER", "ME", "RA"] },
+            { id: "abogado", parts: ["ABO", "GA", "DO"] },
+            { id: "piloto", parts: ["PI", "LO", "TO"] },
+            { id: "músico", parts: ["MÚ", "SI", "CO"] },
+            { id: "arquitecta", parts: ["AR", "QUI", "TEC", "TA"] }
         ];
 
-        let completedCount = 0;
-        const pool = document.getElementById('pieces-pool');
-        const dropZone = document.getElementById('drop-zone');
-        const guide = document.getElementById('guide-items');
+        let score = 0;
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-        function init() {
-            guide.innerHTML = PROFESSIONS.map(p => `<div class="ref-item" id="ref-${p.full}">${p.full} <span>❓</span></div>`).join('');
-            
-            let allParts = [];
-            PROFESSIONS.forEach(p => p.parts.forEach(part => allParts.push({t: part, p: p.full})));
-            allParts.sort(() => Math.random() - 0.5);
+        function playSound(f, d) {
+            const osc = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            osc.frequency.value = f;
+            g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + d);
+            osc.connect(g); g.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + d);
+        }
 
-            allParts.forEach(data => {
+        function spawnBalloons() {
+            for(let i=0; i<10; i++){
+                setTimeout(() => {
+                    const b = document.createElement('div');
+                    b.className = 'balloon';
+                    b.innerHTML = ['🎈', '✨', '🏆', '🎓'][Math.floor(Math.random()*4)];
+                    b.style.left = Math.random() * 90 + 'vw';
+                    document.body.appendChild(b);
+                    setTimeout(() => b.remove(), 6000);
+                }, i * 300);
+            }
+        }
+
+        function resetGame() {
+            score = 0;
+            document.getElementById('win-modal').classList.remove('active');
+            document.getElementById('progress-fill').style.width = '0%';
+            document.getElementById('drop-zone').innerHTML = '';
+            document.getElementById('drop-zone').classList.remove('has-content');
+            initGame();
+        }
+
+        function initGame() {
+            const pool = document.getElementById('pieces-pool');
+            const guide = document.getElementById('guide-container');
+            pool.innerHTML = '';
+            guide.innerHTML = '';
+
+            // 1. Cargar Guía
+            PROFESSIONS.forEach(p => {
+                guide.innerHTML += `<div class="ref-item" id="ref-${p.id}">${p.id} <span>❓</span></div>`;
+            });
+
+            // 2. Mezclar TODAS las piezas (Cambian de lugar cada vez)
+            let allSyllables = [];
+            PROFESSIONS.forEach(p => {
+                p.parts.forEach(s => allSyllables.push({ text: s, parent: p.id }));
+            });
+            allSyllables.sort(() => Math.random() - 0.5);
+
+            allSyllables.forEach(data => {
                 const div = document.createElement('div');
-                div.className = 'piece';
-                div.textContent = data.t;
-                div.dataset.parent = data.p;
+                div.className = 'syllable';
+                div.textContent = data.text;
+                div.dataset.parent = data.parent;
                 div.draggable = true;
-                div.ondragstart = (e) => { div.classList.add('dragging'); };
-                div.ondragend = () => { div.classList.remove('dragging'); };
+                div.ondragstart = (e) => div.classList.add('dragging');
+                div.ondragend = () => div.classList.remove('dragging');
                 pool.appendChild(div);
             });
         }
 
-        dropZone.ondragover = (e) => e.preventDefault();
-        dropZone.ondrop = (e) => {
-            const el = document.querySelector('.dragging');
-            if(el) {
-                dropZone.appendChild(el);
-                dropZone.classList.add('has-items');
-                check();
+        const dz = document.getElementById('drop-zone');
+        dz.ondragover = (e) => e.preventDefault();
+        dz.ondrop = (e) => {
+            const dragging = document.querySelector('.dragging');
+            if(dragging) {
+                dz.appendChild(dragging);
+                dz.classList.add('has-content');
+                checkWord();
             }
         };
 
-        pool.ondragover = (e) => e.preventDefault();
-        pool.ondrop = (e) => {
-            const el = document.querySelector('.dragging');
-            if(el) {
-                pool.appendChild(el);
-                if(dropZone.children.length === 0) dropZone.classList.remove('has-items');
+        const pl = document.getElementById('pieces-pool');
+        pl.ondragover = (e) => e.preventDefault();
+        pl.ondrop = (e) => {
+            const dragging = document.querySelector('.dragging');
+            if(dragging) {
+                pl.appendChild(dragging);
+                if(dz.children.length === 0) dz.classList.remove('has-content');
             }
         };
 
-        function check() {
-            const items = Array.from(dropZone.children);
-            if (items.length < 2) return;
+        function checkWord() {
+            const currentItems = Array.from(dz.children);
+            if (currentItems.length < 2) return;
 
-            const parent = items[0].dataset.parent;
-            const target = PROFESSIONS.find(p => p.full === parent);
-            const currentString = items.map(i => i.textContent).join('');
-            
-            if (currentString === target.parts.join('')) {
-                items.forEach(i => i.classList.add('correct'));
-                showAlert("¡Muy bien!", "msg-correct");
+            const parentId = currentItems[0].dataset.parent;
+            const target = PROFESSIONS.find(p => p.id === parentId);
+            const currentStr = currentItems.map(i => i.textContent).join('');
+
+            if (currentStr === target.parts.join('')) {
+                // ¡CORRECTO!
+                currentItems.forEach(i => i.classList.add('is-correct'));
+                playSound(523, 0.5); setTimeout(() => playSound(659, 0.5), 100);
+                
+                // Confeti individual por palabra
+                confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
+                
+                triggerAlert("¡Excelente!", "bg-win");
+
                 setTimeout(() => {
-                    dropZone.innerHTML = '';
-                    dropZone.classList.remove('has-items');
-                    const refItem = document.getElementById(`ref-${parent}`);
-                    refItem.classList.add('done');
-                    refItem.querySelector('span').textContent = '✅';
-                    completedCount++;
-                    document.getElementById('progress-bar').style.width = (completedCount/PROFESSIONS.length)*100 + '%';
-                    if(completedCount === PROFESSIONS.length) win();
-                }, 800);
-            } else if (items.length >= target.parts.length) {
-                // Pequeño retardo para dejar que el usuario vea la palabra formada antes del error
-                setTimeout(() => {
-                    if(Array.from(dropZone.children).length >= target.parts.length) {
-                         showAlert("Sigue intentando", "msg-error");
-                    }
-                }, 300);
+                    dz.innerHTML = '';
+                    dz.classList.remove('has-content');
+                    const ref = document.getElementById(`ref-${parentId}`);
+                    ref.classList.add('done');
+                    ref.querySelector('span').textContent = '✅';
+                    
+                    score++;
+                    document.getElementById('progress-fill').style.width = (score / PROFESSIONS.length) * 100 + '%';
+                    
+                    if(score === PROFESSIONS.length) finalize();
+                }, 1000);
+            } else if (currentItems.length >= target.parts.length) {
+                playSound(150, 0.4);
+                triggerAlert("Intenta otra vez", "bg-fail");
             }
         }
 
-        function showAlert(txt, cls) {
-            const a = document.getElementById('msg-alert');
+        function triggerAlert(txt, cls) {
+            const a = document.getElementById('alert-box');
             a.textContent = txt; a.className = cls + ' show';
             setTimeout(() => a.classList.remove('show'), 1500);
         }
 
-        function win() {
-            confetti({ particleCount: 180, spread: 80, origin: { y: 0.6 } });
-            document.getElementById('final-screen').classList.add('active');
-            if ('speechSynthesis' in window) {
-                const u = new SpeechSynthesisUtterance("Te felicito, sigue avanzando en tu español.");
-                u.lang = 'es-ES';
-                window.speechSynthesis.speak(u);
-            }
+        function finalize() {
+            playSound(523, 0.3); playSound(659, 0.3); playSound(783, 0.5);
+            confetti({ particleCount: 200, spread: 90, origin: { y: 0.6 } });
+            spawnBalloons();
+            setTimeout(() => {
+                document.getElementById('win-modal').classList.add('active');
+                if ('speechSynthesis' in window) {
+                    const u = new SpeechSynthesisUtterance("Te felicito, sigue avanzando en tu español.");
+                    u.lang = 'es-ES'; window.speechSynthesis.speak(u);
+                }
+            }, 1000);
         }
 
-        init();
+        initGame();
     </script>
 </body>
 </html>
 """
 
-components.html(html_profesiones, height=950, scrolling=False)
+components.html(html_profesiones_premium, height=950, scrolling=False)
