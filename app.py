@@ -1,7 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-st.set_page_config(page_title="Rompecabezas Profesiones", layout="wide")
+st.set_page_config(page_title="Union de silabas Profesiones", layout="wide")
 
 st.markdown("""
     <style>
@@ -156,7 +156,7 @@ html_profesiones_premium = r"""
 <body>
 
     <header>
-        <h1>Rompecabezas - Profesiones</h1>
+        <h1>Unión de sílabas - Profesiones</h1>
         <div class="brand-name">PaoSpanishTeacher</div>
     </header>
 
