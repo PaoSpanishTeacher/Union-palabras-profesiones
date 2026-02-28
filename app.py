@@ -197,7 +197,7 @@ html_profesiones = r"""
 <body>
 
     <header>
-        <h1>Unión de palabras - Profesiones</h1>
+        <h1>Unión de sílabas - Profesiones</h1>
         <div class="brand-name">PaoSpanishTeacher</div>
     </header>
 
