@@ -2,7 +2,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 # Configuración de página
-st.set_page_config(page_title="Rompecabezas Profesiones", layout="wide")
+st.set_page_config(page_title="Formar palabras de Profesiones", layout="wide")
 
 st.markdown("""
     <style>
@@ -39,96 +39,133 @@ html_profesiones = r"""
             background-image: radial-gradient(#00b4d822 2px, transparent 2px), linear-gradient(180deg, #caf0f8 0%, #fdf0d5 100%);
             background-size: 30px 30px, 100% 100%;
             display: flex; flex-direction: column; align-items: center;
+            padding-top: 40px; /* ESPACIO PARA QUE NO SE CORTE EL TITULO */
         }
 
-        header { text-align: center; padding: 15px; }
-        h1 { font-family: 'Fredoka', sans-serif; font-size: 2.5rem; color: var(--text-main); text-shadow: 2px 2px 0px white; }
-        .brand-name { font-family: 'Dancing Script', cursive; font-size: 1.4rem; color: var(--accent); }
+        header { 
+            text-align: center; 
+            padding: 10px 20px 20px 20px; 
+            width: 100%;
+        }
 
-        /* DISEÑO DE COLUMNAS */
+        h1 { 
+            font-family: 'Fredoka', sans-serif; 
+            font-size: clamp(1.8rem, 4vw, 2.8rem); /* Tamaño adaptativo */
+            color: var(--text-main); 
+            text-shadow: 2px 2px 0px white;
+            line-height: 1.2;
+        }
+
+        .brand-name { 
+            font-family: 'Dancing Script', cursive; 
+            font-size: 1.5rem; 
+            color: var(--accent);
+            margin-top: 5px;
+        }
+
         .main-content {
             display: grid;
-            grid-template-columns: 250px 1fr;
-            gap: 20px;
+            grid-template-columns: 260px 1fr;
+            gap: 25px;
             width: 95%;
-            max-width: 1100px;
-            margin-top: 10px;
+            max-width: 1150px;
+            margin-top: 20px;
+            padding-bottom: 50px;
         }
 
-        /* LISTA LATERAL DE GUÍA */
+        /* LISTA LATERAL */
         .reference-list {
             background: white;
             padding: 20px;
             border-radius: 20px;
             border: 3px solid var(--primary);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
             height: fit-content;
+            position: sticky;
+            top: 20px;
         }
         .reference-list h3 { 
             font-family: 'Fredoka', sans-serif; 
             color: var(--secondary); 
             margin-bottom: 15px; 
             text-align: center;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
+            font-size: 1.4rem;
         }
         .ref-item {
-            padding: 8px 12px;
-            margin-bottom: 8px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            font-weight: bold;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            background: #fdfbff;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            font-weight: 700;
             color: var(--text-main);
             text-transform: capitalize;
             display: flex;
             justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
         }
         .ref-item.done {
             background: #e8f5e9;
             color: #2e7d32;
-            text-decoration: line-through;
-            opacity: 0.7;
+            border-color: #c8e6c9;
+            opacity: 0.8;
         }
 
-        .game-area { display: flex; flex-direction: column; gap: 20px; }
+        /* ÁREA JUEGO */
+        .game-area { display: flex; flex-direction: column; gap: 25px; }
 
         .progress-container {
-            width: 100%; background: white; height: 20px;
+            width: 100%; background: white; height: 24px;
             border-radius: 20px; border: 3px solid var(--secondary);
             overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
         #progress-bar {
             height: 100%; width: 0%; background: linear-gradient(90deg, #4cc9f0, #4361ee);
-            transition: width 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: width 0.6s ease-in-out;
         }
 
         .drop-zone {
             background: white; border: 4px dashed var(--text-main);
-            border-radius: 20px; padding: 25px; min-height: 120px;
+            border-radius: 20px; padding: 30px; min-height: 140px;
             display: flex; justify-content: center; align-items: center;
-            gap: 10px; position: relative;
+            gap: 12px; position: relative;
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.05);
         }
         .drop-zone::before {
-            content: "Arrastra las sílabas aquí"; color: #aaa; font-style: italic;
+            content: "Arrastra las sílabas aquí"; color: #aaa; font-style: italic; font-size: 1.1rem;
         }
         .drop-zone.has-items::before { display: none; }
 
         .pieces-pool {
-            background: rgba(255, 255, 255, 0.5); border: 2px solid var(--secondary);
-            border-radius: 20px; padding: 15px; display: flex; flex-wrap: wrap;
-            justify-content: center; gap: 10px; min-height: 180px;
+            background: rgba(255, 255, 255, 0.4); border: 2px solid var(--secondary);
+            border-radius: 20px; padding: 20px; display: flex; flex-wrap: wrap;
+            justify-content: center; gap: 12px; min-height: 220px;
+            backdrop-filter: blur(5px);
         }
 
         .piece {
             background: white; border: 3px solid var(--secondary);
-            border-radius: 10px; padding: 12px 20px;
-            font-family: 'Fredoka', sans-serif; font-size: 1.2rem;
+            border-radius: 12px; padding: 14px 22px;
+            font-family: 'Fredoka', sans-serif; font-size: 1.3rem;
             color: var(--text-main); cursor: grab;
-            box-shadow: 0 4px 0px var(--secondary);
+            box-shadow: 0 5px 0px var(--secondary);
             text-transform: uppercase;
+            transition: transform 0.2s;
         }
-        .piece.dragging { opacity: 0.5; }
+        .piece:hover { transform: translateY(-3px); }
+        .piece.dragging { opacity: 0.4; transform: scale(1.1); }
         .piece.correct { background: var(--success); color: white; border-color: #2e7d32; box-shadow: 0 4px 0px #2e7d32; }
+
+        /* ALERTAS */
+        #msg-alert {
+            position: fixed; top: 15%; left: 50%; transform: translateX(-50%) scale(0);
+            padding: 12px 35px; border-radius: 50px; color: white; font-weight: bold;
+            font-size: 1.3rem; z-index: 100; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #msg-alert.show { transform: translateX(-50%) scale(1); }
+        .msg-correct { background: var(--success); box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4); }
+        .msg-error { background: var(--error); box-shadow: 0 4px 15px rgba(244, 67, 54, 0.4); }
 
         #final-screen {
             position: fixed; inset: 0; background: rgba(255, 255, 255, 0.98);
@@ -139,18 +176,22 @@ html_profesiones = r"""
 
         .btn-restart {
             background: var(--accent); color: white; border: none;
-            padding: 15px 40px; font-size: 1.5rem; border-radius: 50px;
-            cursor: pointer; margin-top: 20px; box-shadow: 0 5px 0px #a3165b;
+            padding: 18px 45px; font-size: 1.6rem; border-radius: 50px;
+            cursor: pointer; margin-top: 25px; box-shadow: 0 6px 0px #a3165b;
+            font-family: 'Fredoka', sans-serif;
         }
 
-        #msg-alert {
-            position: fixed; top: 15%; left: 50%; transform: translateX(-50%) scale(0);
-            padding: 10px 30px; border-radius: 50px; color: white; font-weight: bold;
-            z-index: 100; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        .watermark {
+            position: fixed; bottom: 15px; right: 20px;
+            font-size: 0.9rem; color: rgba(58, 12, 163, 0.2);
+            font-family: 'Dancing Script', cursive; font-weight: bold;
         }
-        #msg-alert.show { transform: translateX(-50%) scale(1); }
-        .msg-correct { background: var(--success); }
-        .msg-error { background: var(--error); }
+
+        @media (max-width: 800px) {
+            .main-content { grid-template-columns: 1fr; }
+            .reference-list { position: relative; top: 0; order: 2; }
+            .game-area { order: 1; }
+        }
     </style>
 </head>
 <body>
@@ -177,11 +218,13 @@ html_profesiones = r"""
     </div>
 
     <div id="msg-alert"></div>
+    <div class="watermark">PaoSpanishTeacher</div>
 
     <div id="final-screen">
-        <span style="font-size: 6rem;">👨‍🏫</span>
-        <h1>¡Excelente trabajo!</h1>
-        <p>Has completado todas las profesiones.</p>
+        <span style="font-size: 7rem;">👨‍🏫</span>
+        <h1 style="margin-bottom: 10px;">¡Excelente trabajo!</h1>
+        <p style="font-size: 1.3rem;">Has completado todas las profesiones.</p>
+        <p style="font-weight: bold; color: var(--accent); margin-top: 10px;">Juego creado por PaoSpanishTeacher</p>
         <button class="btn-restart" onclick="location.reload()">Jugar otra vez</button>
     </div>
 
@@ -205,10 +248,8 @@ html_profesiones = r"""
         const guide = document.getElementById('guide-items');
 
         function init() {
-            // Cargar guía
             guide.innerHTML = PROFESSIONS.map(p => `<div class="ref-item" id="ref-${p.full}">${p.full} <span>❓</span></div>`).join('');
             
-            // Mezclar piezas
             let allParts = [];
             PROFESSIONS.forEach(p => p.parts.forEach(part => allParts.push({t: part, p: p.full})));
             allParts.sort(() => Math.random() - 0.5);
@@ -228,16 +269,20 @@ html_profesiones = r"""
         dropZone.ondragover = (e) => e.preventDefault();
         dropZone.ondrop = (e) => {
             const el = document.querySelector('.dragging');
-            dropZone.appendChild(el);
-            dropZone.classList.add('has-items');
-            check();
+            if(el) {
+                dropZone.appendChild(el);
+                dropZone.classList.add('has-items');
+                check();
+            }
         };
 
         pool.ondragover = (e) => e.preventDefault();
         pool.ondrop = (e) => {
             const el = document.querySelector('.dragging');
-            pool.appendChild(el);
-            if(dropZone.children.length === 0) dropZone.classList.remove('has-items');
+            if(el) {
+                pool.appendChild(el);
+                if(dropZone.children.length === 0) dropZone.classList.remove('has-items');
+            }
         };
 
         function check() {
@@ -250,18 +295,24 @@ html_profesiones = r"""
             
             if (currentString === target.parts.join('')) {
                 items.forEach(i => i.classList.add('correct'));
-                showAlert("¡Correcto!", "msg-correct");
+                showAlert("¡Muy bien!", "msg-correct");
                 setTimeout(() => {
                     dropZone.innerHTML = '';
                     dropZone.classList.remove('has-items');
-                    document.getElementById(`ref-${parent}`).classList.add('done');
-                    document.getElementById(`ref-${parent}`).querySelector('span').textContent = '✅';
+                    const refItem = document.getElementById(`ref-${parent}`);
+                    refItem.classList.add('done');
+                    refItem.querySelector('span').textContent = '✅';
                     completedCount++;
-                    document.getElementById('progress-bar').style.width = (completedCount/10)*100 + '%';
-                    if(completedCount === 10) win();
+                    document.getElementById('progress-bar').style.width = (completedCount/PROFESSIONS.length)*100 + '%';
+                    if(completedCount === PROFESSIONS.length) win();
                 }, 800);
             } else if (items.length >= target.parts.length) {
-                showAlert("Sigue intentando", "msg-error");
+                // Pequeño retardo para dejar que el usuario vea la palabra formada antes del error
+                setTimeout(() => {
+                    if(Array.from(dropZone.children).length >= target.parts.length) {
+                         showAlert("Sigue intentando", "msg-error");
+                    }
+                }, 300);
             }
         }
 
@@ -272,10 +323,12 @@ html_profesiones = r"""
         }
 
         function win() {
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            confetti({ particleCount: 180, spread: 80, origin: { y: 0.6 } });
             document.getElementById('final-screen').classList.add('active');
             if ('speechSynthesis' in window) {
-                window.speechSynthesis.speak(new SpeechSynthesisUtterance("Excelente trabajo"));
+                const u = new SpeechSynthesisUtterance("Te felicito, sigue avanzando en tu español.");
+                u.lang = 'es-ES';
+                window.speechSynthesis.speak(u);
             }
         }
 
@@ -285,4 +338,4 @@ html_profesiones = r"""
 </html>
 """
 
-components.html(html_profesiones, height=850, scrolling=False)
+components.html(html_profesiones, height=950, scrolling=False)
